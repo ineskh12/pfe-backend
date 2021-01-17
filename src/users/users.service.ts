@@ -3,10 +3,25 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './interfaces/user.interface';
 import { UserDto } from './dto/user.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(@InjectModel('User') private readonly userModel: Model<User>,private readonly mailerService: MailerService) {}
+
+  public sendMail(): void {
+    this
+      .mailerService
+      .sendMail({
+        to: 'ines.khelifi.1@esprit.tn', // list of receivers
+        from: 'ali.obba@esprit.tn', // sender address
+        subject: 'Testing Nest MailerModule ✔', // Subject line
+        text: 'welcome', // plaintext body
+        html: '<b>welcome</b>', // HTML body content
+      })
+      .then(() => {})
+      .catch(() => {});
+  }
 
   // CREATE user
   async addUser(createUserDTO: UserDto): Promise<User> {
@@ -16,8 +31,8 @@ export class UsersService {
 
   // READ user
   async getUser(userID): Promise<User> {
-    const customer = await this.userModel.findById(userID).exec();
-    return customer;
+    const usr = await this.userModel.findById(userID).exec();
+    return usr;
   }
 
   // UPDATE user details
@@ -36,8 +51,8 @@ export class UsersService {
 
   // GET ALL users
   async getAllUser(): Promise<User[]> {
-    const customers = await this.userModel.find().exec();
-    return customers;
+    const usrs = await this.userModel.find().exec();
+    return usrs;
   }
 
   // For JWT checking

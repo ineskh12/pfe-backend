@@ -79,4 +79,12 @@ export class UsersController {
     const users = await this.userService.getAllUser();
     return res.status(HttpStatus.OK).json(users);
   }
+
+  @Get('/sendMail')
+  async sendmail(@Res() res) {
+    await this.userService.sendMail();
+
+    return res.status(HttpStatus.OK).send('email sended !!')
+  }
+
 }

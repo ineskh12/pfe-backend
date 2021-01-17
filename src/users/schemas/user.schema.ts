@@ -14,8 +14,12 @@ export const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         select: false
-    },
-    
+    }
+    ,
+    secretcode:{
+        type: String,
+        default: '',
+    }
 
 }, {
   timestamps: true
