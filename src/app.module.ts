@@ -8,33 +8,42 @@ import { AuthModule } from './auth/auth.module';
 import * as path from 'path';
 import { NeconfigModule } from 'neconfig';
 import { TemplatesModule } from './templates/templates.module';
-import { ItemsService } from './items/items.service';
-import { GridsService } from './grids/grids.service';
-import { GridsModule } from './grids/grids.module';
-import { ItemsModule } from './items/items.module';
+
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
     UsersModule,
-    ConfigModule, AuthModule,
+    ConfigModule,
+    AuthModule,
     TemplatesModule,
-    GridsModule,
-    ItemsModule,
+
     NeconfigModule.register({
-      readers: [
-        { name: 'env', file: path.resolve(process.cwd(), '.env') }
-      ]
+      readers: [{ name: 'env', file: path.resolve(process.cwd(), '.env') }],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get('MONGODB_URI'),
-        useNewUrlParser: true,useUnifiedTopology:true,useCreateIndex:true,useFindAndModify:false
-
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        useFindAndModify: false,
       }),
       inject: [ConfigService],
     }),
-   
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 465,
+        ignoreTLS: true,
+        secure: true,
+        auth: {
+          user: 'ines.khelifi.1@esprit.tn',
+          pass: 'cr7bale11rmd',
+        },
+      },
+    }),
   ],
   controllers: [],
   providers: [],

@@ -1,22 +1,17 @@
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Template } from './interfaces/template.interface';
-import { Grid } from 'src/grids/interfaces/grid.interface';
+
 import { User } from 'src/users/interfaces/user.interface';
-import { Item } from 'src/items/interfaces/item.interface';
-import { TemplateDto } from './dto/template.dto';
 
 @Injectable()
 export class TemplatesService {
-    constructor(
-        @InjectModel('Template') private readonly templateModel: Model<Template>,
-        @InjectModel('Grid') private readonly gridModel: Model<Grid>,
-        @InjectModel('Item') private readonly itemModel: Model<Item>,
-      ) {}
-      private products: Template[] = [];
-    
+  constructor(
+    @InjectModel('Template') private readonly templateModel: Model<Template>,
+  ) {}
+  private products: Template[] = [];
+  /* 
       async insertTemplate(name: string,gridId: Grid,userId:User): Promise<Template> {
         const addedTemplate =  new this.templateModel({
           name,
@@ -25,10 +20,9 @@ export class TemplatesService {
         });
         const result = await addedTemplate.save();
         return result;
-     }
+     } */
 
-
-    /*  async getTemplates() {
+  /*  async getTemplates() {
       const templates = await (await this.templateModel.find().sort({name:'asc'}).exec());
       return templates.map(temp => ({
         id: temp.id,
@@ -41,79 +35,121 @@ export class TemplatesService {
       }));
     } */
 
-    async getTemplates() {
-      
-      
-      const template= await this.templateModel.find().sort({name:'asc'}).populate('gridId').populate({
-        path : 'gridId',
-        populate: { path: 'items'}
-      }).exec();
+  async testaddtemp(name, editor, layout, userId) {
+    try {
+      const addedTemplate = new this.templateModel({
+        name: name,
+        editor: editor,
+        layout: layout,
+        userId: userId,
+      });
+
+      const result = await addedTemplate.save();
+      console.log(result);
+    } catch (e) {
+      console.log('template erreur');
+    }
+  }
+
+  async getTemplates(iduser) {
+    const template = await this.templateModel
+      .find({ userId: iduser })
+      .sort({ updatedAt: '-1' })
+      .populate('gridId')
+      .populate({
+        path: 'gridId',
+        populate: { path: 'items' },
+      })
+      .exec();
     return template;
-      }
+  }
 
-    async findById(id): Promise<any> {
-      const template= await this.templateModel.find({_id:id}).populate('gridId').populate({
-        path : 'gridId',
-        populate: { path: 'items'}
-      }).exec();
+  async findById(id): Promise<any> {
+    const template = await this.templateModel
+      .find({ _id: id })
+      .populate('gridId')
+      .populate({
+        path: 'gridId',
+        populate: { path: 'items' },
+      })
+      .exec();
     return template;
-      }
+  }
 
+  async findByUserId(userId): Promise<any> {
+    console.log(userId);
 
-      async findByUserId(userId): Promise<any> {
-        console.log(userId);
-        
-        const template= await this.templateModel.find({userId:userId}).populate('gridId').populate({
-          path : 'gridId',
-          populate: { path: 'items'}
-        }).exec();
-      return template;
-        }
+    const template = await this.templateModel
+      .find({ userId: userId })
+      .populate('gridId')
+      .populate({
+        path: 'gridId',
+        populate: { path: 'items' },
+      })
+      .exec();
+    return template;
+  }
 
-        async SortByTempName(userId): Promise<any> {
-          console.log(userId);
-          
-          const template= await this.templateModel.find({userId:userId}).populate('gridId').populate({
-            path : 'gridId',
-            populate: { path: 'items'}
-          }).sort({name:'asc'}).exec();
-        return template;
-          }
+  async SortByTempName(userId): Promise<any> {
+    console.log(userId);
 
+    const template = await this.templateModel
+      .find({ userId: userId })
+      .populate('gridId')
+      .populate({
+        path: 'gridId',
+        populate: { path: 'items' },
+      })
+      .sort({ name: 'asc' })
+      .exec();
+    return template;
+  }
 
-         
-        async SortAsc(userId): Promise<any> {
-          console.log(userId);
-          
-          const template= await this.templateModel.find({userId:userId}).populate('gridId').populate({
-            path : 'gridId',
-            populate: { path: 'items'}
-          }).sort({nbreofuses:'asc'}).exec();
-        return template;
-          }
-          async SortDsc(userId): Promise<any> {
-            console.log(userId);
-            
-            const template= await this.templateModel.find({userId:userId}).populate('gridId').populate({
-              path : 'gridId',
-              populate: { path: 'items'}
-            }).sort({nbreofuses:'desc'}).exec();
-          return template;
-            }
+  async SortAsc(userId): Promise<any> {
+    console.log(userId);
 
-            async SortDate(userId): Promise<any> {
-              console.log(userId);
-              
-              const template= await this.templateModel.find({userId:userId}).populate('gridId').populate({
-                path : 'gridId',
-                populate: { path: 'items'}
-              }).sort({createdAt:1}).exec();
-            return template;
-              }
+    const template = await this.templateModel
+      .find({ userId: userId })
+      .populate('gridId')
+      .populate({
+        path: 'gridId',
+        populate: { path: 'items' },
+      })
+      .sort({ nbreofuses: 'asc' })
+      .exec();
+    return template;
+  }
+  async SortDsc(userId): Promise<any> {
+    console.log(userId);
 
-        
-      
+    const template = await this.templateModel
+      .find({ userId: userId })
+      .populate('gridId')
+      .populate({
+        path: 'gridId',
+        populate: { path: 'items' },
+      })
+      .sort({ nbreofuses: 'desc' })
+      .exec();
+    return template;
+  }
 
+  async SortDate(userId): Promise<any> {
+    console.log(userId);
+
+    const template = await this.templateModel
+      .find({ userId: userId })
+      .populate('gridId')
+      .populate({
+        path: 'gridId',
+        populate: { path: 'items' },
+      })
+      .sort({ createdAt: 1 })
+      .exec();
+    return template;
+  }
+
+  /* 
           deleteTemplate = async (id) => new Promise((resolve, reject) => {
             this.templateModel
             .findById(id).populate('gridId').populate({
@@ -162,48 +198,51 @@ export class TemplatesService {
           });
         
 
-         
+  */
+  async deleteUser(userID): Promise<any> {
+    const deletedUser = await this.templateModel.findByIdAndRemove(userID);
+    return deletedUser;
+  }
 
-            getPagesTemplate = async (filter, page, count) => new Promise((resolve, reject) => {
-              const pageNumber = page > 0 ? parseInt(page, 10) - 1 : 0;
-              const countNumber = count ? parseInt(count, 10) : 10;
-              return this.templateModel.find(filter)
-              .skip(pageNumber * countNumber)
-              .limit(countNumber)
-              .populate('gridId').populate({
-                path : 'gridId',
-                 populate: { path: 'items'}
-                })
-               .then(
-                 (template) => resolve(template),
-                   )
-                  .catch(
-                  (error) => reject(error),
-                   );
-            
-            })
+  getPagesTemplate = async (filter, page, count) =>
+    new Promise((resolve, reject) => {
+      const pageNumber = page > 0 ? parseInt(page, 10) - 1 : 0;
+      const countNumber = count ? parseInt(count, 10) : 10;
+      return this.templateModel
+        .find(filter)
+        .skip(pageNumber * countNumber)
+        .limit(countNumber)
+        .populate('gridId')
+        .populate({
+          path: 'gridId',
+          populate: { path: 'items' },
+        })
+        .then((template) => resolve(template))
+        .catch((error) => reject(error));
+    });
 
-            getById = (id) => new Promise((resolve, reject) => {
-              try {
+  getById = (id) =>
+    new Promise((resolve, reject) => {
+      try {
+        return this.templateModel
+          .findOne({ _id: id })
+          .populate('gridId')
+          .populate({
+            path: 'gridId',
+            populate: { path: 'items' },
+          })
+          .then((demande) =>
+            demande
+              ? resolve(demande)
+              : reject('There is no Demande registered with the provided id.'),
+          )
+          .catch((error) => reject(error));
+      } catch (err) {
+        return reject(err);
+      }
+    });
 
-                return this.templateModel.findOne({_id : id})
-                .populate('gridId').populate({
-                  path : 'gridId',
-                   populate: { path: 'items'}
-                  })
-                    .then(
-                        (demande) => (demande ? resolve(demande) : reject('There is no Demande registered with the provided id.'))
-                    )
-                    .catch(
-                        (error) => reject(error)
-                    )
-            } catch (err) {
-                return reject(err)
-        
-            }
-            })
-
-           /*  updateTemplate = async (id,name,items) => new Promise((resolve, reject) => {
+  /*  updateTemplate = async (id,name,items) => new Promise((resolve, reject) => {
               this.templateModel.findById(id).populate('gridId').populate({
                 path : 'gridId',
                  populate: { path: 'items'}
@@ -269,12 +308,4 @@ export class TemplatesService {
              
             });
  */
-          
-
-
-
-
-
-
 }
-
